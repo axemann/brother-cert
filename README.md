@@ -17,7 +17,23 @@ It may be easiest to manually perform the initial configuration of SSL on the pr
 to use this tool for subsequent updates. However, this is not required. The only required manual step
 is to install the root CA for the certificates you plan to use.
 
-## Usage
+## Model Support
+
+This fork adds support for multiple Brother printer models. The tool auto-detects
+the printer model from the status page and selects the appropriate form field
+names for the certificate import page.
+
+Currently supported models:
+
+- **MFC-L2710DW** (original target)
+- **MFC-L3780CDW**
+
+To add support for a new model, capture the multipart POST to
+`/net/security/certificate/import.html` (e.g. via mitmproxy) and add an entry to
+the `knownModels` map in `pkg/printer/model_fields.go` with the field names
+(`pageid`, `FieldA`, `FieldB`, `CertProcessControl`, `FileField`, `Password`,
+`HiddenCertImportPassword`). Models not in the map fall back to the MFC-L2710DW
+defaults.
 
 The tool will:
 1. Connect to the printer,
