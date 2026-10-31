@@ -66,12 +66,14 @@ func (p *printer) UploadNewCert(keyPem, certPem []byte) (string, error) {
 		return "", err
 	}
 
+mf := p.modelFields()
+
 	// make writer for multipart/form-data submission
 	var formDataBuffer bytes.Buffer
 	formWriter := multipart.NewWriter(&formDataBuffer)
 
 	// make form fields
-	err = formWriter.WriteField("pageid", "507")
+	err = formWriter.WriteField("pageid", mf.PageID)
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
@@ -81,22 +83,22 @@ func (p *printer) UploadNewCert(keyPem, certPem []byte) (string, error) {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	err = formWriter.WriteField("B18a8", "")
+	err = formWriter.WriteField(mf.FieldA, "")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	err = formWriter.WriteField("B18b6", "")
+	err = formWriter.WriteField(mf.FieldB, "")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	err = formWriter.WriteField("hidden_certificate_process_control", "1")
+	err = formWriter.WriteField(mf.CertProcessControl, "1")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	p12W, err := formWriter.CreateFormFile("B178f", "certkey.p12")
+	p12W, err := formWriter.CreateFormFile(mf.FileField, "certkey.p12")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
@@ -106,12 +108,12 @@ func (p *printer) UploadNewCert(keyPem, certPem []byte) (string, error) {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	err = formWriter.WriteField("B1790", "")
+	err = formWriter.WriteField(mf.Password, "")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}
 
-	err = formWriter.WriteField("hidden_cert_import_password", "")
+	err = formWriter.WriteField(mf.HiddenCertImportPassword, "")
 	if err != nil {
 		return "", fmt.Errorf("printer: upload: failed to write form (%w)", err)
 	}

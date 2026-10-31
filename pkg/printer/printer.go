@@ -9,8 +9,9 @@ import (
 
 // printer is a struct to interact with a remote Brother printer
 type printer struct {
-	httpClient *http.Client
-	baseUrl    string
+	httpClient     *http.Client
+	baseUrl        string
+	detectedModel  string
 }
 
 // PrinterConfig contains the information necessary to create a printer
@@ -79,6 +80,14 @@ func NewPrinter(cfg Config) (*printer, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// detect model for model-specific field names
+	model, err := p.detectModel()
+	if err != nil {
+		// non-fatal: fall back to default model fields
+		model = ""
+	}
+	p.detectedModel = model
 
 	return p, nil
 }
